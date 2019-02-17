@@ -1,0 +1,55 @@
+---
+
+- name: selinux disable
+  selinux:
+    state: disabled
+
+- name: sites-available dir ensure
+  file:
+    state: directory
+    path: "{{ item }}"
+    owner: root
+    group: root
+  loop:
+    - "/etc/nginx/sites-enabled"
+    - "/etc/nginx/sites-available"
+  notify:
+    - nginx restart
+
+
+- name: Ensures nginx vhosts configfiles presents
+  template:
+    src: "templates/etc/nginx/sites-available/{{ item.key }}.j2"
+    dest: "/etc/nginx/sites-available/{{ item.value }}.conf"
+    mode: 0644
+    owner: root
+    group: root
+  loop: "{{ vhosts|dict2items }}"
+  notify:
+    - nginx restart
+
+- name: Create symbolic link
+  file:
+    src: "/etc/nginx/sites-available/{{ item.value }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ item.value }}.conf"
+    state: link
+    force: yes
+    mode: 0644
+    owner: root
+    group: root
+    remote_src: true
+  loop: "{{ vhosts|dict2items }}"
+  notify:
+    - nginx restart
+
+- name: Ensures nginx configfiles presents
+  template:
+    src: "templates/etc/nginx/{{ item }}.j2"
+    dest: "/etc/nginx/{{ item }}.conf"
+    mode: 0644
+    owner: root
+    group: root
+  loop:
+    - nginx
+  notify:
+    - nginx restart

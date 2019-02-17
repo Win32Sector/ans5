@@ -1,0 +1,11 @@
+---
+- name: Ensures nginx vhosts configfiles presents
+  template:
+    src: "templates/{{ item.key }}.j2"
+    dest: "/etc/nginx/sites-available/{{ item.value }}.conf"
+    mode: 0644
+    owner: root
+    group: root
+  loop: "{{ vhosts|dict2items }}"
+  notify:
+    - nginx restart

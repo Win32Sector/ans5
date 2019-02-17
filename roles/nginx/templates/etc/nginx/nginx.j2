@@ -1,0 +1,35 @@
+#####################
+#{{ ansible_managed }}
+#####################
+
+user nginx;
+worker_processes {{ nginxconf_worker_processes }};
+{% if nginxconf_pid_file %}
+pid {{ nginxconf_pid_file }};
+{% endif %}
+
+events {
+        worker_connections {{ nginxconf_worker_connections }};
+        use epoll;
+        multi_accept on;
+}
+
+http {
+        {% for parameter in nginxconf_http_default_parameters %}
+        {{ parameter }};
+        {% endfor %}
+        include /etc/nginx/mime.types;
+        include /etc/nginx/conf.d/*.conf;
+
+        default_type application/octet-stream;
+
+        access_log {{ nginxconf_access_log }};
+        error_log {{ nginxconf_error_log }};
+
+        gzip on;
+        gzip_min_length 1024;
+        gzip_proxied expired no-cache no-store private auth;
+        gzip_types text/plain text/css text/xml text/javascript application/x-javascript application/xml;
+        gzip_disable "msie6";
+
+}

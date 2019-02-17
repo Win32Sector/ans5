@@ -1,0 +1,17 @@
+---
+nginxconf_access_log: "/var/log/nginx/access.log"
+nginxconf_error_log: "/var/log/nginx/access.log"
+nginxconf_worker_connections: "2048"
+nginxconf_worker_processes: "4"
+
+vhosts:
+  example1.com: example1.com
+
+nginxconf_pid_file: "/run/nginx.pid"
+nginxconf_http_default_parameters:
+  - sendfile on
+  - tcp_nopush on
+  - tcp_nodelay on
+  - keepalive_timeout 65
+  - keepalive_requests 1000
+  - types_hash_max_size 2048

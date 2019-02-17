@@ -1,0 +1,28 @@
+---
+- name: Install Certbot
+  package:
+    name: "certbot"
+    state: "present"
+
+- name: Check if certificate already exists.
+  stat:
+    path: /etc/letsencrypt/live/{{ certbot_domain | first | replace('*.', '') }}/cert.pem
+  register: letsencrypt_cert
+
+- name: Stop services to allow certbot to generate a cert.
+  service:
+    name: "nginx"
+    state: stopped
+
+- name: Generate new certificate if one doesn't exist.
+  command: "{{ certbot_create_command }}"
+
+- include_tasks: nginx-config-edit.yml
+
+- name: Start services after cert has been generated.
+  service:
+    name: "nginx"
+    state: started
+
+- import_tasks: renew-cron.yml
+  when: certbot_auto_renew

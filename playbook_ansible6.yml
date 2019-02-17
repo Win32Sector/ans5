@@ -1,0 +1,23 @@
+---
+- hosts: hosts
+  become: yes
+  roles:
+    - nginx
+    - certbot
+  vars:
+    nginxconf_access_log: "/var/log/web-sites/access.log"
+    nginxconf_error_log: "/var/log/web-sites/access.log"
+    nginxconf_worker_connections: "1024"
+    nginxconf_worker_processes: "2"
+
+    vhosts:
+      example1.com: "sovvvest.rebrainme.srwx.net"
+
+    nginxconf_pid_file: "/run/nginx/nginx.pid"
+    nginxconf_http_default_parameters:
+      - sendfile on
+      - tcp_nopush on
+      - tcp_nodelay on
+      - keepalive_timeout 30
+      - keepalive_requests 500
+      - types_hash_max_size 4096
